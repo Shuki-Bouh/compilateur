@@ -7,7 +7,8 @@ void Lexer::run(char * file) {
     ifstream stream(file);
     int out = 0;
     if (stream) {
-         out = this->parse_file(&stream);
+        cout << "Fichier ouvert" << endl;
+        out = this->parse_file(&stream);
     } else {
         cout << "Impossible d'ouvrir le fichier" << endl;
         exit(1);
@@ -21,8 +22,9 @@ void Lexer::run(char * file) {
 int Lexer::create_lexem(string * value, int (&position)[2]) {
     int statut = 0;
     if (*value != "") {
-        string kind = this->find_type(value);
+        string kind = "";//this->find_type(value);
         Lexem lex(kind, *value, position);
+        this->lexems.push_back(lex);
     }
     else {
         statut = 1;
@@ -37,6 +39,8 @@ int Lexer::parse_file(ifstream * stream) {
     string row;
     int col_position;
 
+    bool is_str = false; // celui-ci sert à savoir si on est encore dans une chaîne de caractère
+
     istringstream row_stream;
 
     // Valeurs des lexems
@@ -48,134 +52,72 @@ int Lexer::parse_file(ifstream * stream) {
 
     string temp;
 
-
-
     while (getline(*stream, row)) {
         col_position = 0;
-
         auto col = row.begin();
         while (col < row.end()) {
             string col_str(1, *col);
+            cout << temp << endl;
             auto itt_expr = this->regex.find(temp);
             auto itt_col = this->regex.find(col_str);
-            if (col_str == "\"") {
+            if (col_str == "\"" || is_str) {
                 // Todo : avancer jusqu'au prochiain "
-            }
-            else {
-                if (itt_col != this->regex.end()) {
-                    //TODO : nouveau lexem pour un caractère régulier
-                    //TODO : vider temp et ajouter un nouveau lexem
+                if (col_str == "\"") {
+                    is_str = 1 - is_str;
+                    this->create_lexem(&temp, position);
+                    temp.clear();
+                    position[0] = row_position;
+                    position[1] = col_position;
                 }
                 else {
-                    if (itt_expr != this->regex.end()) {
-                        //Todo : nouveau lexem pour un mot régulier
+                    temp.push_back(*col);
+                }
+            }
+            else {
+                if (itt_expr != this->regex.end()) {
+                    //Todo : nouveau lexem pour un mot régulier
+                    //TODO : vider temp et ajouter un nouveau lexem
+                    Lexem lex(itt_expr->second, itt_expr->first, position);
+                    this->lexems.push_back(lex);
+                    temp.clear();
+                }
+                else {
+                    if (itt_col != this->regex.end()) {
                         //TODO : vider temp et ajouter un nouveau lexem
-                    } else {
+                        this->create_lexem(&temp, position);
+                        temp.clear();
+                        //TODO : nouveau lexem pour un caractère régulier
+                        position[0] = row_position;
+                        position[1] = col_position;
+                        Lexem lex(itt_col->second, itt_col->first, position);
+                        this->lexems.push_back(lex);
+                    }
+                    else {
                         if (col_str == " " || col_str == "\n") {
                             // Todo : créer un nouveau lexem pour la valeur nouvelle
                             // TODO : vider temp
+
+                            this->create_lexem(&temp, position);
+                            temp.clear();
+                            position[0] = row_position;
+                            position[1] = col_position+1; // Car le lexem suivant commence après l'espace, s'il s'agit
+                                                          // d'un \n, col_position sera remis à 0 après
+
+                        } else {
+                            // Todo : ajouter à temp
+                            temp.push_back(*col);
                         }
                     }
                 }
             }
-
-
-
-
-
-
-
-
-            else {
-                for (auto c = temp.begin(); c < temp.end(); c++) {
-                    string c_str(1, *c);
-                    auto expr = this->regex.find(c_str);
-                    if (expr != this->regex.end()) {
-
-                    }
-                }
-                string temp_str(temp.begin(), temp.end());
-                auto expr = this->regex.find(temp_str);
-            }
-        }
-    }
-
-
-
-
-    while (data[i] != '\0') {
-        temp.clear();
-        if (data[i] == '\n') {
-            ligne++;
-            col = 0;
-        }
-        auto el = this->regex.find(&data[i]);
-        if (el != this->regex.end()) {
-            temp.push_back(data[i]);
-            if ( data[i+1] == '='){
-                temp.push_back('=');
-                i++;
-                col++;
-            }
-            valeur = this->convertVect2Str(temp);
-            kind = this->trouve_type(valeur);
-            position[0] = ligne;
-            position[1] = col;
-            Lexem lex(kind, valeur, position);
-            this->lexems.push_back(lex);
-            i++;
+            col_position++;
             col++;
         }
-        else{
-            if (data[i] == '"') {
-                position[0] = ligne;
-                position[1] = col;
-                col++;
-                try {
-                    temp.push_back('"');
-                    while (data[i] != '"') {
-                        temp.push_back(data[i]);
-                        col++;
-                        i++;
-                    }
-                    temp.push_back('"');
-                    valeur = this->convertVect2Str(temp);
-                    Lexem lex("string", valeur, position);
-                    this->lexems.push_back(lex);
-                }
-                catch (...) {
-                    cout << "Manque guillemets" << endl;
-                }
-                col++;
-            }
-            if (data[i] != ' ' && data[i] != '\t') {
-                position[0] = ligne;
-                position[1] = col;
-                auto el = this->regex.find(&data[i]);
-                while ( data[i] != '\n' &&
-                        el == this->regex.end() &&
-                        data[i] != ' ' &&
-                        data[i] != '\t' &&
-                        data[i] != '\0')
-                {
-                    temp.push_back(data[i]);
-                    i++;
-                    col++;
-                    el = this->regex.find(&data[i]);
-                }
-                valeur = this->convertVect2Str(temp);
-                kind = this->trouve_type(valeur);
-                Lexem lex(kind, valeur, position);
-                this->lexems.push_back(lex);
-            }
-            else{
-                col++;
-                i++;
-            }
-
-        }
+    row_position++;
     }
+    return 0;
 }
+
 
 string Lexer::find_type(string * value) {
     string out;
@@ -186,6 +128,6 @@ int main(int argc, char ** argv) {
 
     Lexer lexer;
 
-    lexer.run("prog");
-    cout << lexer.lexems[1].valeur;
+    lexer.run("./prog");
+    cout << lexer.lexems[2].kind;
 }

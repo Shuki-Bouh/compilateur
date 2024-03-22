@@ -1,17 +1,15 @@
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <sstream>
-#include <vector>
+#include "Lexer.h"
 using namespace std;
 
 
 int main(int argc, char ** argv) {
-    char * a = " ";
-
-    string b = "c";
-
-    cout << (b == a);
+    string a = "main";
+    Lexer lexer;
+    auto b = lexer.regex.find(a);
+    cout << b->second << endl;
 
     return 0;
 }

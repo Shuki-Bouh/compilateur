@@ -21,7 +21,8 @@ public:
     int create_lexem(string * value, int (&position)[2]);
 
 
-private:
+//private:
+
 
     const unordered_map<string, string> regex = {
             {"main", "kw_main"},
