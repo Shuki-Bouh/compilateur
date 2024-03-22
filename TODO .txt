@@ -1,0 +1,6 @@
+TODO :
+Mettre un get et set pour lexems
+
+run() : vérifier l'ouverture du fichier (et renvoyer en int, le statut de réussite)
+
+vérifier que les références sont non nulles

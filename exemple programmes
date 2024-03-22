@@ -1,0 +1,13 @@
+figure() {
+
+    point a = (1,2);
+    distance d = 5;
+    cercle c = (point, distance);
+
+}
+
+La figure possede :
+
+un point a, de coordonnees 1 et 2, de couleur bleu
+une distance d, de valeur 1
+un cercle de centre a, de distance d et de couleur rouge
