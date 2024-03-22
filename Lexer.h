@@ -16,8 +16,9 @@ public:
     vector<Lexem> lexems;
 
     void run(char * file);
-    void parse_file(ifstream * stream);
-    char * trouve_type(char* word);
+    int parse_file(ifstream * stream);
+    string find_type(string * value);
+    int create_lexem(string * value, int (&position)[2]);
 
 
 private:

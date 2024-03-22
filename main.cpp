@@ -7,18 +7,11 @@ using namespace std;
 
 
 int main(int argc, char ** argv) {
-    vector<char> test {'a', 'c', 'f', 'd'};
-    auto a = test.begin();
-    char temp = 'c';
-    string b(1, temp);
-    cout << b << endl;
-    b.push_back('a');
-    cout << b;
-    string
-    switch (condition) {
+    char * a = " ";
 
-    }
+    string b = "c";
 
+    cout << (b == a);
 
     return 0;
 }

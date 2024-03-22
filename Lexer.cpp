@@ -5,19 +5,32 @@ using namespace std;
 
 void Lexer::run(char * file) {
     ifstream stream(file);
-
+    int out = 0;
     if (stream) {
-        this->parse_file(&stream);
+         out = this->parse_file(&stream);
     } else {
         cout << "Impossible d'ouvrir le fichier" << endl;
         exit(1);
     }
 
+    if (out != 0) {
+        exit(2);
+    }
 }
 
+int Lexer::create_lexem(string * value, int (&position)[2]) {
+    int statut = 0;
+    if (*value != "") {
+        string kind = this->find_type(value);
+        Lexem lex(kind, *value, position);
+    }
+    else {
+        statut = 1;
+    }
+    return statut;
+}
 
-
-void Lexer::parse_file(ifstream * stream) {
+int Lexer::parse_file(ifstream * stream) {
     // Indices du parcours du fichier
 
     int row_position = 0;
@@ -33,7 +46,7 @@ void Lexer::parse_file(ifstream * stream) {
 
     // Liste temporaire du lexem en cours
 
-    vector<char> temp;
+    string temp;
 
 
 
@@ -43,10 +56,36 @@ void Lexer::parse_file(ifstream * stream) {
         auto col = row.begin();
         while (col < row.end()) {
             string col_str(1, *col);
-            auto expr = this->regex.find(col_str);
-            if (*col != ' ' && *col != '\n' && expr != this->regex.end()) {
-                temp.push_back(*col);
+            auto itt_expr = this->regex.find(temp);
+            auto itt_col = this->regex.find(col_str);
+            if (col_str == "\"") {
+                // Todo : avancer jusqu'au prochiain "
             }
+            else {
+                if (itt_col != this->regex.end()) {
+                    //TODO : nouveau lexem pour un caractère régulier
+                    //TODO : vider temp et ajouter un nouveau lexem
+                }
+                else {
+                    if (itt_expr != this->regex.end()) {
+                        //Todo : nouveau lexem pour un mot régulier
+                        //TODO : vider temp et ajouter un nouveau lexem
+                    } else {
+                        if (col_str == " " || col_str == "\n") {
+                            // Todo : créer un nouveau lexem pour la valeur nouvelle
+                            // TODO : vider temp
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
             else {
                 for (auto c = temp.begin(); c < temp.end(); c++) {
                     string c_str(1, *c);
@@ -138,25 +177,9 @@ void Lexer::parse_file(ifstream * stream) {
     }
 }
 
-char * Lexer::trouve_type(char *word) {
-    char * type;
-    if (word == "true" || word == "false")
-        type = "bool";
-    else {
-        try {
-            atoi(word);
-            type = "int";
-        }
-        catch (...) {
-            try {
-                float(word);
-                type = "float";
-            }
-            catch (...) {type = "ident";}
-        }
-    }
-    return type;
-}
+string Lexer::find_type(string * value) {
+    string out;
+    return out;}
 
 
 int main(int argc, char ** argv) {
