@@ -3,4 +3,4 @@ project(compilateur)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(compilateur main.cpp)
+add_executable(compilateur src/main.cpp)
