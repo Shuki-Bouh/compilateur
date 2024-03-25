@@ -18,7 +18,7 @@ public:
     void run(char * file);
     int parse_file(ifstream * stream);
     string find_type(string * value);
-    int create_lexem(string * value, int (&position)[2]);
+    int create_lexem(string * value, int (&position)[2], string kind = "");
 
 
 //private:
